@@ -8,7 +8,6 @@ fabric = [[0 for _ in range(FABRIC_SIDE)] for _ in range(FABRIC_SIDE)]
 
 for line in lines:
     match = re.match(r'#([\d]+) @ ([\d]+),([\d]+): ([\d]+)x([\d]+)', line)
-    claim_id    = int(match.group(1))
     from_left   = int(match.group(2))
     from_right  = int(match.group(3))
     width       = int(match.group(4))
