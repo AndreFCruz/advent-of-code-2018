@@ -19,7 +19,7 @@ def shortest_polymer(string):
     for base in set(string.upper()):
         s = list(filter(lambda c: c.upper() != base, string))
         lengths.append(len(perform_reactions(s)))
-        print('base "{}": {}'.format(base, lengths[-1]))
+        # print('base "{}": {}'.format(base, lengths[-1]))
     return min(lengths)
 
 print(len(perform_reactions(line)))
