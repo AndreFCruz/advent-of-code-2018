@@ -75,24 +75,18 @@ class MapMatrix:
     def get_coord_id(self, x, y):
         return self.ids_map[(x, y)]
 
-    @staticmethod
-    def next_points(x, y, directions=((0,1),(0,-1),(1,0),(-1,0))):
-        return [(x+d[0], y+d[1]) for d in directions]
-
-    # @staticmethod
-    # def distance(x1, y1, x2, y2):
-    #     return abs(x2- x1) + abs(y2 - y1)
-
     def print(self): # Transpose (flip x/y) for printing
         for x in range(len(self.coord_ids)):
             for y in range(len(self.coord_ids[x])):
                 print('{:3}'.format(self.coord_ids[x,y]), end='')
             print(end='\n')
 
-
+    @staticmethod
+    def next_points(x, y, directions=((0,1),(0,-1),(1,0),(-1,0))):
+        return [(x+d[0], y+d[1]) for d in directions]
 
 if __name__ == '__main__':
-    coords = [[int(coord) for coord in l.rstrip().split(', ')] for l in open('../input/day06.in').readlines()]
+    coords = [[int(coord) for coord in l.rstrip().split(', ')] for l in sys.stdin.readlines()]
 
     matrix = MapMatrix(coords)
     matrix.expand()
