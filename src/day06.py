@@ -109,3 +109,13 @@ if __name__ == '__main__':
 
     ## First part
     print(max(areas))
+
+    ## Second part
+    MAX_DIST_TO_COORD = 10000
+    distance = lambda p1, p2: abs(p2[0] - p1[0]) + abs(p2[1] - p1[1])
+    distance_sums = np.asarray(
+        [[sum([distance((x, y), matrix.get_matrix_pos(c_x, c_y)) for c_x, c_y in matrix.ids_map.keys()]) \
+            for y in range(len(matrix.distances[x]))] for x in range(len(matrix.distances))]
+    )
+
+    print(len(distance_sums[distance_sums < MAX_DIST_TO_COORD]))
