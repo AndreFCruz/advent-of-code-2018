@@ -8,13 +8,14 @@ def perform_reactions(string):
     while i < len(string) - 1:
         if string[i].upper() == string[i+1].upper() and string[i] != string[i+1]:
             string = string[:i] + string[i+2:]
-            i -= 1
+            i = max(i-1, 0)
         else:
             i += 1
 
     return string
 
 # O(n) attempt by modifying the string in place instead of creating a new one at each iteration
+## roughly x4 speed-up on the puzzle input
 def perform_reactions_in_place(string):
     def find_nearest(li, condition, start, end, step=1):
         for i in range(start, end, step):
@@ -30,7 +31,7 @@ def perform_reactions_in_place(string):
             break
         if s[i] != '.' and s[i].upper() == s[nearest_base].upper() and s[i] != s[nearest_base]:
             s[i], s[nearest_base] = '.', '.' # Mark to be removed
-            i = find_nearest(s, lambda c: c != '.', start=i-1, end=-1, step=-1)
+            i = find_nearest(s, lambda c: c != '.', start=max(i-1,0), end=-1, step=-1)
         else:
             i = find_nearest(s, lambda c: c != '.', start=i+1, end=len(s), step=1)
 
