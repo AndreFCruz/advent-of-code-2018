@@ -56,7 +56,6 @@ def calc_path(dependencies):
 
     path = list()
     while len(dep_map) > 0:
-        print(elems_with_no_dependencies)
         elem = min(elems_with_no_dependencies)
         elems_with_no_dependencies.remove(elem)
         remove_dependency(elem)
@@ -64,13 +63,45 @@ def calc_path(dependencies):
 
     return path
 
+## Assuming dependencies aren't cyclic (not solvable otherwise)
+def topological_dag_path(dependencies):
+    """
+    Khan's algorithm implementation.
+    This does the same as 'calc_path(dependencies)', but more
+     efficiently as it does not require a full depedency map.
+    """
+    incoming_edges = build_dependency_map(dependencies)    # elem -> {incoming edges}
+    outgoing_edges = {e: set() for e in incoming_edges.keys()}
+    for e1, inc_edges in incoming_edges.items():
+        for e2 in inc_edges:
+            outgoing_edges[e2].add(e1)
+
+    elems_with_no_dependencies = {e for e in incoming_edges.keys() if len(incoming_edges[e]) == 0}
+
+    path = list()
+    ## Following Kahn's algorithm for topological sort of a directed acyclic graph
+    while len(elems_with_no_dependencies) > 0:
+        elem = min(elems_with_no_dependencies)  # min -> first alphabetically
+        elems_with_no_dependencies.remove(elem)
+        path.append(elem)
+
+        for node in outgoing_edges[elem].copy():
+            outgoing_edges[elem].remove(node)
+            incoming_edges[node].remove(elem)
+            if len(incoming_edges[node]) == 0:
+                elems_with_no_dependencies.add(node)
+    
+    assert len([s for s in incoming_edges.values() if len(s) > 0]) == 0 ## Assert no inc edges left
+    assert len([s for s in outgoing_edges.values() if len(s) > 0]) == 0 ## Assert no out edges left
+
+    return path
+
 if __name__ == '__main__':
     lines = [l.rstrip() for l in open('../input/day07.in')]
     matches = [re.match(r'Step ([A-Z]) must be finished before step ([A-Z]) can begin.', l) for l in lines]
-    dependencies = [(m.group(1), m.group(2)) for m in matches]
+    dependencies = [(m.group(2), m.group(1)) for m in matches]
 
     ## First part
     print(''.join(calc_path(dependencies)))
+
     
-
-
