@@ -96,12 +96,53 @@ def topological_dag_path(dependencies):
 
     return path
 
+def get_time_to_solve(dependencies, num_workers, cost_map):
+    dep_map = build_full_dependency_map(dependencies)
+    possible_jobs = {e for e, deps in dep_map.items() if len(deps) == 0}
+    for job in possible_jobs:
+        del dep_map[job]
+
+    time = 0
+    path = list()
+    current_jobs = dict()
+    free_workers = num_workers
+    while True:
+
+        # Check for new jobs
+        while free_workers > 0 and len(possible_jobs) > 0:
+            job = possible_jobs.pop()
+            current_jobs[job] = cost_map[job]
+            free_workers -= 1
+
+        # Step all jobs
+        for job in list(current_jobs.keys()):
+            current_jobs[job] -= 1
+            if current_jobs[job] == 0:  # Job finished
+                free_workers += 1
+                del current_jobs[job]
+                path.append(job)
+
+                for e in list(dep_map.keys()):
+                    dep_map[e] -= {job}
+                    if len(dep_map[e]) == 0:
+                        possible_jobs.add(e)
+                        del dep_map[e]
+
+        time += 1
+        if len(current_jobs) == 0 and len(possible_jobs) == 0:
+            break
+
+    return time
+
 if __name__ == '__main__':
-    lines = [l.rstrip() for l in open('../input/day07.in')]
+    lines = [l.rstrip() for l in sys.stdin.readlines()]
     matches = [re.match(r'Step ([A-Z]) must be finished before step ([A-Z]) can begin.', l) for l in lines]
     dependencies = [(m.group(2), m.group(1)) for m in matches]
 
     ## First part
     print(''.join(calc_path(dependencies)))
 
-    
+    ## Second part
+    NUM_WORKERS = 5
+    letter_to_int = {chr(i): 60 + i - 64 for i in range(65, 65+26)}
+    print(get_time_to_solve(dependencies, NUM_WORKERS, letter_to_int))
