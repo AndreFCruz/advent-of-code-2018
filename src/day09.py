@@ -15,7 +15,6 @@ class MarbleGame:
             curr_marble, curr_player = self.next_play()
 
             if curr_marble % 23 == 0:
-                # import ipdb; ipdb.set_trace()
                 idx = self.get_index_n_counterclockwise(7)
                 marble_to_remove = self.marbles.pop(idx)
                 self.player_scores[curr_player] += curr_marble + marble_to_remove
@@ -26,9 +25,8 @@ class MarbleGame:
                 self.marbles.insert(idx, curr_marble)
                 self.current_marble_idx = idx
 
-            # print(self, end='\n\n')
-            if self.current_marble_num % (10 ** 5) == 0:
-                print('{} / {}'.format(self.current_marble_num, self.last_marble_worth))
+            # if self.current_marble_num % (10 ** 5) == 0:
+            #     print('Progress: {} / {}'.format(self.current_marble_num, self.last_marble_worth))
 
     def next_play(self): # Returns next_marble, next_player
         next_m = self.current_marble_num
@@ -48,20 +46,18 @@ class MarbleGame:
 
 if __name__ == '__main__':
     import re
-    # line = sys.stdin.readline().rstrip()
-    line = open('../input/day09.in').readline().rstrip()
-    # line = "30 players; last marble is worth 5807 points"
+    line = sys.stdin.readline().rstrip()
 
     match = re.match(r'([\d]+) players; last marble is worth ([\d]+) points', line)
     num_players = int(match.group(1))
     last_marble_worth = int(match.group(2))
 
     ## First part
-    # game = MarbleGame(num_players, last_marble_worth)
-    # game.play()
-    # print(max(game.player_scores))
+    game = MarbleGame(num_players, last_marble_worth)
+    game.play()
+    print(max(game.player_scores))
 
-    ## Second part ## NOTE There's surely a more efficient way to do this
+    ## Second part ## NOTE Surely there's a better way to do this
     game = MarbleGame(num_players, last_marble_worth * 100)
     game.play()
     print(max(game.player_scores))
