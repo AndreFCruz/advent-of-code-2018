@@ -2,12 +2,6 @@ import sys
 import numpy as np
 from scipy.signal import convolve2d
 
-def get_max_grouping(matrix):
-    """
-    Returns the maximum 
-    """
-    filtered = convolve2d(matrix, np.ones((3, 3), dtype=np.int), mode='valid')
-    return np.unravel_index(np.argmax(filtered), filtered.shape)
 
 def make_fuel_grid(shape, grid_serial_num):
     grid = np.ndarray(shape, dtype=np.int)
@@ -23,12 +17,42 @@ def make_fuel_grid(shape, grid_serial_num):
 
     return grid
 
+def get_max_grouping(matrix, group_size=(3,3)):
+    """
+    Returns the maximum 
+    """
+    filtered = convolve2d(matrix, np.ones(group_size, dtype=np.int), mode='valid')
+    indices = np.unravel_index(np.argmax(filtered), filtered.shape)
+    return indices, filtered[indices]
+
+def get_max_variable_size_grouping(matrix):
+    max_val = None
+    max_side = None
+    max_indices = None
+    for i in range(1, 301):  # Should be up to 300
+        indices, val = get_max_grouping(matrix, (i, i))
+        if max_side is None or val > max_val:
+            max_val = val
+            max_side = i
+            max_indices = indices
+        elif val < 0:
+            break
+
+    return max_indices, max_side, max_val
+        
+
 
 if __name__ == '__main__':
-    grid_serial_num = int(open('../input/day11.in').readline().rstrip())
+    grid_serial_num = int(sys.stdin.readline().rstrip())
     GRID_SHAPE = (300, 300)
 
     ## First part
     grid = make_fuel_grid(GRID_SHAPE, grid_serial_num)
-    max_square_idx = get_max_grouping(grid)
+    max_square_idx, _ = get_max_grouping(grid)
+
+    ## Add +1 to each coordinate to convert 0-indexed to 1-indexed
     print('{},{}'.format(* (max_square_idx[0] + 1, max_square_idx[1] + 1)))
+
+    ## Second part
+    indices, side, _ = get_max_variable_size_grouping(grid)
+    print('{},{},{}'.format(* (indices[0] + 1, indices[1] + 1, side)))
