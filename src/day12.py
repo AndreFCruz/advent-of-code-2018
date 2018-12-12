@@ -23,10 +23,15 @@ def iterate_once(state, rules):
 
 def iterate_plants(state, rules, iterations):
     index_of_first_elem = 0
-    for i in range(iterations):
+    prev_state = None
+    for i in range(1, iterations + 1):
         state, index_offset = iterate_once(state, rules)
         index_of_first_elem += index_offset
-    return state, index_of_first_elem
+        if prev_state == state:
+            return state, index_of_first_elem, i
+        prev_state = state
+
+    return state, index_of_first_elem, iterations
 
 if __name__ == '__main__':
     lines = sys.stdin.readlines()
@@ -34,15 +39,15 @@ if __name__ == '__main__':
     initial_state = [c for c in lines[0][15:].rstrip()]
     rules = [re.match(r'([\.\#]+) => ([\.\#])', l) for l in lines[2:]]
     rules = {m.group(1) : m.group(2) for m in rules}
-    assert rules['.....'] != '#', "pls no, infinite plants"
+    assert '.....' not in rules or rules['.....'] != '#', "pls no, infinite plants"
 
     ## First part
     NUM_ITERATIONS = 20
-    final_state, idx_first_elem = iterate_plants(initial_state, rules, NUM_ITERATIONS)
-    print(sum([i + idx_first_elem for i in range(len(final_state)) if final_state[i] == '#']))
+    final_state, idx_offset, _ = iterate_plants(initial_state, rules, NUM_ITERATIONS)
+    print(sum([i + idx_offset for i in range(len(final_state)) if final_state[i] == '#']))
 
 
     ## Second part
-    # NUM_ITERATIONS = 50000000000
-    # final_state, idx_first_elem = iterate_plants(initial_state, rules, NUM_ITERATIONS)
-    # print(sum([i + idx_first_elem for i in range(len(final_state)) if final_state[i] == '#']))
+    NUM_ITERATIONS = 50000000000
+    final_state, idx_offset, num_iters = iterate_plants(initial_state, rules, NUM_ITERATIONS)
+    print(sum([i + idx_offset + (NUM_ITERATIONS - num_iters) for i in range(len(final_state)) if final_state[i] == '#']))
