@@ -29,18 +29,17 @@ def get_max_variable_size_grouping(matrix):
     max_val = None
     max_side = None
     max_indices = None
-    for i in range(1, 301):  # Should be up to 300
+    for i in range(1, 301):
         indices, val = get_max_grouping(matrix, (i, i))
         if max_side is None or val > max_val:
             max_val = val
             max_side = i
             max_indices = indices
-        elif val < 0:
+        elif val < 0 and max_val is not None and max_val > 0:
             break
 
     return max_indices, max_side, max_val
         
-
 
 if __name__ == '__main__':
     grid_serial_num = int(sys.stdin.readline().rstrip())
